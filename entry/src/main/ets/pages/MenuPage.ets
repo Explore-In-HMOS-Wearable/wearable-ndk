@@ -1,13 +1,11 @@
-import { router } from '@kit.ArkUI';
 
 @Builder
-export function LandingPageBuilder(name: string, param: Object) {
-  LandingPage()
+export function MenuPageBuilder(name: string, param: Object) {
+  MenuPage()
 }
 
-@Entry
 @Component
-export struct LandingPage {
+export struct MenuPage {
   pageInfos: NavPathStack = new NavPathStack();
 
   build() {
@@ -20,7 +18,7 @@ export struct LandingPage {
               .fontColor(Color.White)
               .fontWeight(FontWeight.Bold)
               .onClick(() => {
-                router.back()
+                this.pageInfos.pop()
               })
 
           }
@@ -34,9 +32,9 @@ export struct LandingPage {
 
           this.buildMenuItem('Flex Liquid Ball ', Color.Blue, Color.White, Color.Blue,
             () => {
-              router.replaceUrl({
-                url: 'pages/Index',
-              });
+
+              this.pageInfos.pushPathByName('Index', null);
+
             })
 
           Blank().height(2)

@@ -1,4 +1,3 @@
-import { ColorMetrics, router } from '@kit.ArkUI';
 import {
   LengthMetrics, LengthUnit,
   ArcButton, ArcButtonOptions, ArcButtonStatus, ArcButtonStyleMode, ArcButtonPosition

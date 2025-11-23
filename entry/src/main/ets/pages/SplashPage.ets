@@ -1,14 +1,19 @@
-import { curves, router } from '@kit.ArkUI';
+import { curves } from '@kit.ArkUI';
 import { AnimatedText } from '../components/AnimatedText';
 
-@Entry
+@Builder
+export function SplashPageBuilder(name: string, param: Object) {
+  SplashPage()
+}
+
 @Component
-struct SplashPage {
+export struct SplashPage {
   private timerId = 0;
   @State planeOffsetX: number = -400;
   @State planeOffsetY: number = 350;
   @State animateEarth: boolean = false;
   @State earthTranslateY: number = 300;
+  pageInfos: NavPathStack = new NavPathStack();
 
   aboutToAppear() {
 
@@ -17,9 +22,9 @@ struct SplashPage {
     }, 100);
 
     this.timerId = setTimeout(() => {
-      router.replaceUrl({
-        url: 'pages/MenuPage',
-      });
+
+      this.pageInfos.pushPathByName('MenuPage', null);
+
     }, 2000);
   }
 
@@ -43,42 +48,25 @@ struct SplashPage {
   }
 
   build() {
-    Stack() {
 
-      // Column() {
-      //   Image('')
-      //     .width(80)
-      //     .translate({ y: this.earthTranslateY })
-      //     .height(80)
-      //     .animation({
-      //       curve: curves.initCurve(),
-      //       iterations: 1,
-      //       duration: 500,
-      //       playMode: PlayMode.Alternate,
-      //     })
-      //     .onAppear(() => {
-      //       this.earthTranslateY = 20;
-      //     })
-      // }
-      // .height('100%')
-      // .width('100%')
-      // .justifyContent(FlexAlign.Center)
+    NavDestination() {
 
-      AnimatedText()
-        .position({
-          y: 60
-        })
+      Stack() {
 
-      // Image($rawfile('ic_splash_plane.png'))
-      //   .width(100)
-      //   .height(100)
-      //   .position({ x: this.planeOffsetX, y: this.planeOffsetY })
-      //   .rotate({ angle: -30 })
+        AnimatedText()
+          .position({
+            y: 60
+          })
 
+      }
+      .width('100%')
+      .height('100%')
+      .backgroundColor(Color.Black)
 
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor(Color.Black)
+    .hideTitleBar(true)
+    .onReady((context: NavDestinationContext) => {
+      this.pageInfos = context.pathStack
+    })
   }
 }

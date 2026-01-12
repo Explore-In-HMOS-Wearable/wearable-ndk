@@ -14,6 +14,10 @@ export struct Index {
   @State isRendering: boolean = false;
   pageInfos: NavPathStack = new NavPathStack();
 
+  private getRandomInt(max: number): number {
+    return Math.floor((Date.now() % 10000) / 10000 * max);
+  }
+
   build() {
 
     NavDestination() {
@@ -65,8 +69,8 @@ export struct Index {
           onButtonClick: () => {
 
             if (this.xComponentContext) {
-              const randomX = Math.random() * 540 + 30;
-              const randomY = Math.random() * 540 + 30;
+              const randomX = this.getRandomInt(26540) % 345;
+              const randomY = this.getRandomInt(62540) % 245;
               nativeRender.addMetaball(this.xComponentContext, randomX, randomY);
               this.metaballCount++;
             }
@@ -83,7 +87,7 @@ export struct Index {
     .hideTitleBar(true)
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      // Logger.info('current page config info is ' + JSON.stringify(context.getConfigInRouteMap()));
+
     })
 
   }

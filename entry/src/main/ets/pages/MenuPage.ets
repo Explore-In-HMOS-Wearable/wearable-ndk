@@ -62,7 +62,7 @@ export struct MenuPage {
     .hideTitleBar(true)
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      // Logger.info('current page config info is ' + JSON.stringify(context.getConfigInRouteMap()));
+
     })
   }
 
@@ -71,7 +71,7 @@ export struct MenuPage {
     action: () => void) {
     Row({ space: 10 }) {
 
-      Text('🌊 '+label)
+      Text(`🌊 ` + label)
         .fontSize(15)
         .fontWeight(FontWeight.Bold)
         .fontColor(Color.White)

@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.hmosdemos.wearablendk",
+    "bundleName": "com.hmosdemos.wearable.wearable_ndk",
     "vendor": "hmosdemos",
     "versionCode": 1000000,
     "versionName": "1.0.0",

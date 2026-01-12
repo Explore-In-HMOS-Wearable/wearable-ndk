@@ -13,10 +13,10 @@ Interactive flexballs visual built with OpenGL ES 3.0 on HarmonyOS NEXT. Tap the
 # Preview
 
 <div>
-    <img src="./screenshots/_metaball1.gif" width="24%"/>
-    <img src="./screenshots/_metaball2.gif" width="24%"/>
-    <img src="./screenshots/_splash.gif" width="24%"/>
-    <img src="./screenshots/_menu.png" width="24%"/>
+<img src="./screenshots/_metaball1.gif" width="24%"/>
+<img src="./screenshots/_metaball2.gif" width="24%"/>
+<img src="./screenshots/_splash.gif" width="24%"/>
+<img src="./screenshots/_menu.png" width="24%"/>
 </div>
 
 # Use Cases
@@ -72,17 +72,15 @@ entry/src/main
 └─ resources/
 ```
 
-## Constraints and Restrictions
+# Constraints and Restrictions
 
-**Supported Devices**
+## Supported Devices
 
 * HarmonyOS devices with **OpenGL ES 3.0** support
 * Tested target: Huawei Watch-class devices (round screens supported)
 
-**Requirements**
+## Requirements
 
-* HarmonyOS NEXT SDK (API 19+)
-* DevEco Studio 5.1.x
 * Native toolchain enabled; module name must remain **entry** (matches NAPI `nm_modname` → `libentry.so`)
 
 # License

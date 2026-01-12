@@ -29,14 +29,19 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-      windowStage.loadContent('pages/NavigationRouter', (err) => {
+    windowStage.loadContent('pages/NavigationRouter', (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
       hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
-      let uiContext:  UIContext | undefined = windowStage.getMainWindowSync().getUIContext()
-      AppStorage.setOrCreate('uiContext', uiContext);
+      try {
+        const uiContext: UIContext | undefined = windowStage.getMainWindowSync().getUIContext()
+        AppStorage.setOrCreate('uiContext', uiContext);
+
+      } catch (error) {
+        // TODO: Implement error handling.
+      }
     });
   }
 

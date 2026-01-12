@@ -6,39 +6,20 @@ export function SplashPageBuilder(name: string, param: Object) {
   SplashPage()
 }
 
+@Entry
 @Component
 export struct SplashPage {
   private timerId = 0;
-  @State planeOffsetX: number = -400;
-  @State planeOffsetY: number = 350;
-  @State animateEarth: boolean = false;
-  @State earthTranslateY: number = 300;
+  planeOffsetX: number = -400;
+  planeOffsetY: number = 350;
+  animateEarth: boolean = false;
+  earthTranslateY: number = 300;
   pageInfos: NavPathStack = new NavPathStack();
 
   aboutToAppear() {
-
-    setTimeout(() => {
-      this.startPlaneAnimation();
-    }, 100);
-
     this.timerId = setTimeout(() => {
-
       this.pageInfos.pushPathByName('MenuPage', null);
-
     }, 2000);
-  }
-
-  startPlaneAnimation() {
-    animateTo({
-      curve: curves.initCurve(),
-      duration: 4500,
-      delay: 0,
-      iterations: 1,
-      playMode: PlayMode.Normal
-    }, () => {
-      this.planeOffsetX = 500;
-      this.planeOffsetY = -150;
-    });
   }
 
   onDestroy() {
@@ -48,16 +29,17 @@ export struct SplashPage {
   }
 
   build() {
-
     NavDestination() {
-
       Stack() {
-
         AnimatedText()
           .position({
             y: 60
           })
-
+          .transition(
+            TransitionEffect.OPACITY
+              .animation({ duration: 300, curve: Curve.EaseInOut })
+              .combine(TransitionEffect.scale({ x: 0.8, y: 0.8 }))
+          )
       }
       .width('100%')
       .height('100%')

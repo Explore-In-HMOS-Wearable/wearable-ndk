@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <hilog/log.h>
 #include <random>
@@ -17,41 +31,41 @@ const char *METABALL_SYNC_NAME = "metaballVSync";
 #endif
 
 #define MAX_METABALLS 100
-#define PI 3.14159265359f
+#define PI 3.1416f
 
-char vertexShader[] = "#version 300 es\n"
-                      "layout(location = 0) in vec4 a_position;\n"
-                      "void main()\n"
-                      "{\n"
-                      "   gl_Position = a_position;\n"
-                      "}\n";
-
-char fragmentShader[] = "#version 300 es\n"
-                        "precision highp float;\n"
-                        "out vec4 fragColor;\n"
-                        "uniform vec2 metaballArray[100];\n"
-                        "uniform int numMetaballs;\n"
-                        "uniform float screenHeight;\n"
-                        "uniform float metaballRadiusSquared;\n"
+char g_vertexShader[] = "#version 300 es\n"
+                        "layout(location = 0) in vec4 a_position;\n"
                         "void main()\n"
                         "{\n"
-                        "   vec2 pixelCoord = gl_FragCoord.xy;\n"
-                        "   pixelCoord.y = screenHeight - pixelCoord.y;\n"
-                        "   float sum = 0.0;\n"
-                        "   for(int i = 0; i < numMetaballs; i++) {\n"
-                        "       vec2 diff = metaballArray[i] - pixelCoord;\n"
-                        "       float distSquared = dot(diff, diff);\n"
-                        "       if(distSquared < 0.001) distSquared = 0.001;\n"
-                        "       sum += metaballRadiusSquared / distSquared;\n"
-                        "   }\n"
-                        "   vec3 color = vec3(0.0);\n"
-                        "   if(sum >= 1.0) {\n"
-                        "       color = vec3(0.1, 0.8, 0.9);\n"
-                        "   } else if(sum >= 0.5) {\n"
-                        "       color = vec3(0.05, 0.4, 0.6);\n"
-                        "   }\n"
-                        "   fragColor = vec4(color, 1.0);\n"
+                        "   gl_Position = a_position;\n"
                         "}\n";
+
+char g_fragmentShader[] = "#version 300 es\n"
+                          "precision highp float;\n"
+                          "out vec4 fragColor;\n"
+                          "uniform vec2 metaballArray[100];\n"
+                          "uniform int numMetaballs;\n"
+                          "uniform float screenHeight;\n"
+                          "uniform float metaballRadiusSquared;\n"
+                          "void main()\n"
+                          "{\n"
+                          "   vec2 pixelCoord = gl_FragCoord.xy;\n"
+                          "   pixelCoord.y = screenHeight - pixelCoord.y;\n"
+                          "   float sum = 0.0;\n"
+                          "   for(int i = 0; i < numMetaballs; i++) {\n"
+                          "       vec2 diff = metaballArray[i] - pixelCoord;\n"
+                          "       float distSquared = dot(diff, diff);\n"
+                          "       if(distSquared < 0.001) distSquared = 0.001;\n"
+                          "       sum += metaballRadiusSquared / distSquared;\n"
+                          "   }\n"
+                          "   vec3 color = vec3(0.0);\n"
+                          "   if(sum >= 1.0) {\n"
+                          "       color = vec3(0.1, 0.8, 0.9);\n"
+                          "   } else if(sum >= 0.5) {\n"
+                          "       color = vec3(0.05, 0.4, 0.6);\n"
+                          "   }\n"
+                          "   fragColor = vec4(color, 1.0);\n"
+                          "}\n";
 
 struct Metaball {
     float x, y;
@@ -60,24 +74,26 @@ struct Metaball {
     bool active;
 };
 
-std::vector<Metaball> metaballs;
-float metaballPositions[2 * MAX_METABALLS] = {0};
-std::mt19937 rng;
+std::vector<Metaball> g_metaballs;
+float g_metaballPositions[2 * MAX_METABALLS] = {0};
+std::mt19937 g_rng;
 
-void InitMetaballs() {
-    metaballs.clear();
-    rng.seed(std::random_device{}());
+void InitMetaballs()
+{
+    g_metaballs.clear();
+    g_rng.seed(std::random_device{}());
     LOGI("Metaballs initialized");
 }
 
-void AddMetaball(float x, float y, float screenWidth, float screenHeight, float radius) {
-    if (metaballs.size() >= MAX_METABALLS) {
+void AddMetaball(float x, float y, float screenWidth, float screenHeight, float radius)
+{
+    if (g_metaballs.size() >= MAX_METABALLS) {
         LOGW("Maximum metaballs reached");
         return;
     }
 
     std::uniform_real_distribution<float> angleDist(0, 2.0f * PI);
-    float angle = angleDist(rng);
+    float angle = angleDist(g_rng);
 
     Metaball mb;
     mb.x = x;
@@ -87,26 +103,27 @@ void AddMetaball(float x, float y, float screenWidth, float screenHeight, float 
     mb.radius = radius;
     mb.active = true;
 
-    metaballs.push_back(mb);
-    LOGI("Metaball added at (%{public}f, %{public}f), total: %{public}zu", x, y, metaballs.size());
+    g_metaballs.push_back(mb);
+    LOGI("Metaball added at (%{public}f, %{public}f), total: %{public}zu", x, y, g_metaballs.size());
 }
 
-void UpdateMetaballs(float screenWidth, float screenHeight, float speed) {
-    for (size_t i = 0; i < metaballs.size(); i++) {
-        if (!metaballs[i].active)
+void UpdateMetaballs(float screenWidth, float screenHeight, float speed)
+{
+    for (size_t i = 0; i < g_metaballs.size(); i++) {
+        if (!g_metaballs[i].active)
             continue;
 
-        metaballs[i].x += metaballs[i].dirX * speed;
-        metaballs[i].y += metaballs[i].dirY * speed;
+        g_metaballs[i].x += g_metaballs[i].dirX * speed;
+        g_metaballs[i].y += g_metaballs[i].dirY * speed;
 
-        metaballPositions[2 * i] = metaballs[i].x;
-        metaballPositions[2 * i + 1] = metaballs[i].y;
+        g_metaballPositions[2 * i] = g_metaballs[i].x;
+        g_metaballPositions[2 * i + 1] = g_metaballs[i].y;
 
-        if (metaballs[i].x >= screenWidth || metaballs[i].x <= 0) {
-            metaballs[i].dirX *= -1.0f;
+        if (g_metaballs[i].x >= screenWidth || g_metaballs[i].x <= 0) {
+            g_metaballs[i].dirX *= -1.0f;
         }
-        if (metaballs[i].y >= screenHeight || metaballs[i].y <= 0) {
-            metaballs[i].dirY *= -1.0f;
+        if (g_metaballs[i].y >= screenHeight || g_metaballs[i].y <= 0) {
+            g_metaballs[i].dirY *= -1.0f;
         }
     }
 }
@@ -116,7 +133,8 @@ struct SyncParam {
     void *window = nullptr;
 };
 
-static EGLConfig getConfig(EGLDisplay eglDisplay) {
+static EGLConfig getConfig(EGLDisplay eglDisplay)
+{
     int attribList[] = {EGL_SURFACE_TYPE,
                         EGL_WINDOW_BIT,
                         EGL_RED_SIZE,
@@ -140,7 +158,8 @@ static EGLConfig getConfig(EGLDisplay eglDisplay) {
 }
 
 
-void EGLCore::OnSurfaceCreated(void *window, int w, int h) {
+void EGLCore::OnSurfaceCreated(void *window, int w, int h)
+{
     LOGD("EGLCore::OnSurfaceCreated w=%{public}d, h=%{public}d", w, h);
     width_ = w;
     height_ = h;
@@ -167,7 +186,6 @@ void EGLCore::OnSurfaceCreated(void *window, int w, int h) {
             void *window = syncParam->window;
             if (!eglCore || !window) return;
 
-            // Düzeltme: reinterpret_cast kullan
             eglCore->mEglWindow = reinterpret_cast<EGLNativeWindowType>(window);
             eglCore->mEGLDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
@@ -207,7 +225,7 @@ void EGLCore::OnSurfaceCreated(void *window, int w, int h) {
                 return;
             }
 
-            eglCore->mProgramHandle = eglCore->CreateProgram(vertexShader, fragmentShader);
+            eglCore->mProgramHandle = eglCore->CreateProgram(g_vertexShader, g_fragmentShader);
             if (!eglCore->mProgramHandle) {
                 LOGE("Could not create program");
                 return;
@@ -230,7 +248,8 @@ void EGLCore::OnSurfaceCreated(void *window, int w, int h) {
 }
 
 
-void EGLCore::RenderLoop() {
+void EGLCore::RenderLoop()
+{
     if (!eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
         LOGE("RenderLoop: eglMakeCurrent error = %{public}d", eglGetError());
         return;
@@ -244,10 +263,10 @@ void EGLCore::RenderLoop() {
     glUseProgram(mProgramHandle);
 
     GLint numMetaballsLoc = glGetUniformLocation(mProgramHandle, "numMetaballs");
-    glUniform1i(numMetaballsLoc, (int)metaballs.size());
+    glUniform1i(numMetaballsLoc, (int)g_metaballs.size());
 
     GLint metaballArrayLoc = glGetUniformLocation(mProgramHandle, "metaballArray");
-    glUniform2fv(metaballArrayLoc, MAX_METABALLS, metaballPositions);
+    glUniform2fv(metaballArrayLoc, MAX_METABALLS, g_metaballPositions);
 
     GLfloat vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -265,16 +284,24 @@ void EGLCore::RenderLoop() {
         (void *)this);
 }
 
-void EGLCore::AddMetaballAt(float x, float y) { AddMetaball(x, y, (float)width_, (float)height_, 25.0f); }
+void EGLCore::AddMetaballAt(float x, float y)
+{
+    AddMetaball(x, y, (float)width_, (float)height_, 25.0f);
+}
 
-void EGLCore::ClearAllMetaballs() {
-    metaballs.clear();
+void EGLCore::ClearAllMetaballs()
+{
+    g_metaballs.clear();
     LOGI("All metaballs cleared");
 }
 
-void EGLCore::Update() { eglSwapBuffers(mEGLDisplay, mEGLSurface); }
+void EGLCore::Update()
+{
+    eglSwapBuffers(mEGLDisplay, mEGLSurface);
+}
 
-GLuint EGLCore::LoadShader(GLenum type, const char *shaderSrc) {
+GLuint EGLCore::LoadShader(GLenum type, const char *shaderSrc)
+{
     GLuint shader = glCreateShader(type);
     if (shader == 0)
         return 0;
@@ -299,7 +326,8 @@ GLuint EGLCore::LoadShader(GLenum type, const char *shaderSrc) {
     return shader;
 }
 
-GLuint EGLCore::CreateProgram(const char *vertexShader, const char *fragShader) {
+GLuint EGLCore::CreateProgram(const char *vertexShader, const char *fragShader)
+{
     GLuint vertex = LoadShader(GL_VERTEX_SHADER, vertexShader);
     GLuint fragment = LoadShader(GL_FRAGMENT_SHADER, fragShader);
     GLuint program = glCreateProgram();
@@ -333,7 +361,8 @@ GLuint EGLCore::CreateProgram(const char *vertexShader, const char *fragShader) 
     return program;
 }
 
-void EGLCore::OnSurfaceDestroyed() {
+void EGLCore::OnSurfaceDestroyed()
+{
     LOGI("EGLCore::OnSurfaceDestroyed");
     if (mVsync) {
         OH_NativeVSync_Destroy(mVsync);
@@ -349,7 +378,8 @@ void EGLCore::OnSurfaceDestroyed() {
     }
 }
 
-void EGLCore::OnSurfaceChanged(void *window, int32_t w, int32_t h) {
+void EGLCore::OnSurfaceChanged(void *window, int32_t w, int32_t h)
+{
     width_ = w;
     height_ = h;
 }
